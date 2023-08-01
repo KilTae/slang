@@ -7,105 +7,98 @@ import pandas as pd
 from bs4 import BeautifulSoup as bs
 import warnings
 
-
-slangtitle = []
-slangdescription = []
+slang_title = []
+slang_description = []
+dictionary_numbers = [1, 2, 5, 6, 8, 11, 12, 14, 18]
 
 url = "https://open-pro.dict.naver.com/_ivo/search?searchVal=신조어"
-
-
-
 browser = webdriver.Safari()
 browser.get(url)
-sum = 0
-num = 2
-sumnum = 2
-nextpage = 0
-bububu = 1
-page = 2
 
+sum = 0
+n = 2
+total_n = 2
+slang_page = 0
+sum_dictionary = 1
+dictionary_page = 2
+next_dictionary = 1
+
+'''
 card = browser.find_element(By.CLASS_NAME, "title-num").text
-bubu = 1
+전체 사전집 크롤링
+'''
+
 while(1) :
     time.sleep(3)
-    if bububu == int(card) : break
-    if bubu > 20 :
-        cur_css = '#content > div.section-main > div.dict > div.page > button:nth-child({})'.format(page)
-        bubu = 0 
+    if sum_dictionary == len(dictionary_numbers) : break
+    if next_dictionary > 20 :
+        cur_css = '#content > div.section-main > div.dict > div.page > button:nth-child({})'.format(dictionary_page)
         button = browser.find_element(By.CSS_SELECTOR, cur_css)
         button.click()
-        page += 1
+        dictionary_page += 1
+        next_dictionary = 0 
         
     else :
-        cur_css = '#content > div.section-main > div.dict > ul.dict-list.pc > li:nth-child({})'.format(bubu)
+        cur_css = '#content > div.section-main > div.dict > ul.dict-list.pc > li:nth-child({})'.format(dictionary_numbers[next_dictionary - 1])
         button = browser.find_element(By.CSS_SELECTOR, cur_css)
         button.click()
+        time.sleep(3) 
+
+    while(1) :
+        pagesize = browser.find_elements(By.XPATH,'//*[@id="content"]/div[2]/div[4]/div[3]/button[@class="page-btn"]')
+        next = browser.find_elements(By.CLASS_NAME, "next-btn")
+
+        if len(next):
+            time.sleep(3)
+            sum += 10
+            slang_page += 1
+            button = browser.find_element(By.CSS_SELECTOR,'#content > div.section-main > div.word > div.page > button.next-btn')
+            button.click()
+
+        else :
+            sum += len(pagesize) + 1
+            break
+
+    if slang_page > 0 :
+        browser.find_element(By.CSS_SELECTOR,'#content > div.section-main > div.word > div.page > button.prev-btn' ).click()
+        slang_page -= 1
+
+    while(True) :
         time.sleep(3)
-        browser.back()
-    
+        titles = browser.find_elements(By.CLASS_NAME , "card-title")
+        descriptions = browser.find_elements(By.CLASS_NAME, "card-desc__text")
 
-    bububu += 1
-    bubu += 1
+        for title in titles:
+            slang_title.append(title.text)
 
+        for description in descriptions:
+            slang_description.append(description.text)
 
+        if n == 11 :
+            cur_css = '#content > div.section-main > div.word > div.page > button.next-btn'
+            n = 2
+        
+        elif total_n == sum+1 : 
+            browser.get(url)
+            sum = 0
+            n = 2
+            total_n = 2
+            slang_page = 0
+            break
 
-'''
-while(1) :
-    pagesize = browser.find_elements(By.XPATH,'//*[@id="content"]/div[2]/div[4]/div[3]/button[@class="page-btn"]')
-    next = browser.find_elements(By.CLASS_NAME, "next-btn")
+        else :
+            cur_css = '#content > div.section-main > div.word > div.page > button:nth-child({})'.format(n)
 
-    if len(next):
-        time.sleep(3)
-        sum += 10
-        nextpage += 1
-        button = browser.find_element(By.CSS_SELECTOR,'#content > div.section-main > div.word > div.page > button.next-btn')
+        button = browser.find_element(By.CSS_SELECTOR, cur_css)
         button.click()
+        n += 1
+        total_n +=1
 
-    else :
-        sum += len(pagesize) + 1
-        break
+    sum_dictionary += 1
+    next_dictionary += 1
+    data = {"title" : slang_title, "description" : slang_description}
+    df = pd.DataFrame(data)
+    df.to_csv("test3.csv", encoding = "utf-8-sig")
 
-if nextpage > 0 :
-    browser.find_element(By.CSS_SELECTOR,'#content > div.section-main > div.word > div.page > button.prev-btn' ).click()
-    nextpage -= 1
-    
-    
-while(True) :
-    time.sleep(3)
-
-    titles = browser.find_elements(By.CLASS_NAME , "card-title")
-    descriptions = browser.find_elements(By.CLASS_NAME, "card-desc__text")
-
-    for title in titles:
-        slangtitle.append(title.text)
-
-    for description in descriptions:
-        slangdescription.append(description.text)
-
-    if num == 11 :
-        cur_css = '#content > div.section-main > div.word > div.page > button.next-btn'
-        num = 2
-    
-    elif sumnum == sum+1 : break
-
-    else :
-        cur_css = '#content > div.section-main > div.word > div.page > button:nth-child({})'.format(num)
-
-    button = browser.find_element(By.CSS_SELECTOR, cur_css)
-    button.click()
-    num += 1
-    sumnum +=1
-    print(sumnum)
-
-
-
-data = {"title" : slangtitle, "description" : slangdescription}
-df = pd.DataFrame(data)
-print(df)
-
-df.to_csv("test3.csv", encoding = "utf-8-sig")
-
-'''
 time.sleep(10)
-
 browser.close()
