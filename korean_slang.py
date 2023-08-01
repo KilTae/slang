@@ -11,7 +11,9 @@ import warnings
 slangtitle = []
 slangdescription = []
 
-url = "https://open-pro.dict.naver.com/_ivo/dictmain?dictID=9eb2c40e824f4611aa244cdb40f068d0"
+url = "https://open-pro.dict.naver.com/_ivo/search?searchVal=신조어"
+
+
 
 browser = webdriver.Safari()
 browser.get(url)
@@ -19,7 +21,35 @@ sum = 0
 num = 2
 sumnum = 2
 nextpage = 0
+bububu = 1
+page = 2
 
+card = browser.find_element(By.CLASS_NAME, "title-num").text
+bubu = 1
+while(1) :
+    time.sleep(3)
+    if bububu == int(card) : break
+    if bubu > 20 :
+        cur_css = '#content > div.section-main > div.dict > div.page > button:nth-child({})'.format(page)
+        bubu = 0 
+        button = browser.find_element(By.CSS_SELECTOR, cur_css)
+        button.click()
+        page += 1
+        
+    else :
+        cur_css = '#content > div.section-main > div.dict > ul.dict-list.pc > li:nth-child({})'.format(bubu)
+        button = browser.find_element(By.CSS_SELECTOR, cur_css)
+        button.click()
+        time.sleep(3)
+        browser.back()
+    
+
+    bububu += 1
+    bubu += 1
+
+
+
+'''
 while(1) :
     pagesize = browser.find_elements(By.XPATH,'//*[@id="content"]/div[2]/div[4]/div[3]/button[@class="page-btn"]')
     next = browser.find_elements(By.CLASS_NAME, "next-btn")
@@ -75,7 +105,7 @@ print(df)
 
 df.to_csv("test3.csv", encoding = "utf-8-sig")
 
-
+'''
 time.sleep(10)
 
 browser.close()
