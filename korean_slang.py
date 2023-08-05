@@ -97,16 +97,6 @@ while(1) :
     sum_dictionary += 1
     next_dictionary += 1
 
-
-
-'''
-slangs = zip(slang_title, slang_description)
-df = pd.DataFrame.from_dict(slangs)
-'''
-
-
-
-
 data = {"title" : slang_title, "description" : slang_description}
 df = pd.DataFrame(data)
 print(df)
