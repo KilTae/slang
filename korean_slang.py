@@ -9,7 +9,7 @@ import warnings
 
 slang_title = []
 slang_description = []
-dictionary_numbers = [1, 2, 5, 6, 8, 11, 12, 14, 18]
+dictionary_numbers = [1, 2, 4, 6, 8, 9, 10, 13, 17]
 
 url = "https://open-pro.dict.naver.com/_ivo/search?searchVal=신조어"
 browser = webdriver.Safari()
@@ -19,7 +19,7 @@ sum = 0
 n = 2
 total_n = 2
 slang_page = 0
-sum_dictionary = 1
+sum_dictionary = 0
 dictionary_page = 2
 next_dictionary = 1
 
@@ -68,11 +68,11 @@ while(1) :
         titles = browser.find_elements(By.CLASS_NAME , "card-title")
         descriptions = browser.find_elements(By.CLASS_NAME, "card-desc__text")
 
-        for title in titles:
-            slang_title.append(title.text)
-
-        for description in descriptions:
-            slang_description.append(description.text)
+        for title, description in zip(titles, descriptions):
+            if title.text not in slang_title :
+                print(title.text)
+                slang_title.append(title.text)
+                slang_description.append(description.text)
 
         if n == 11 :
             cur_css = '#content > div.section-main > div.word > div.page > button.next-btn'
@@ -96,9 +96,21 @@ while(1) :
 
     sum_dictionary += 1
     next_dictionary += 1
-    data = {"title" : slang_title, "description" : slang_description}
-    df = pd.DataFrame(data)
-    df.to_csv("test3.csv", encoding = "utf-8-sig")
+
+
+
+'''
+slangs = zip(slang_title, slang_description)
+df = pd.DataFrame.from_dict(slangs)
+'''
+
+
+
+
+data = {"title" : slang_title, "description" : slang_description}
+df = pd.DataFrame(data)
+print(df)
+df.to_csv("test3.csv", encoding = "utf-8-sig")
 
 time.sleep(10)
 browser.close()
