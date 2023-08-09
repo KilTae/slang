@@ -3,12 +3,13 @@ import sys
 import urllib.parse
 import urllib.request
 import ssl
+import csv_to_dataframe
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
 client_id = "D507KngjGElfvs6kHu9Z"
 client_secrect = "EPQNZ2cmSZ"
-encText = urllib.parse.quote("만나서 반갑습니다.")
+encText = urllib.parse.quote(csv_to_dataframe.text1)
 data = "source=ko&target=en&text=" + encText
 url = "https://openapi.naver.com/v1/papago/n2mt"
 request = urllib.request.Request(url)
